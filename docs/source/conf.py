@@ -7,14 +7,15 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../')) 
+sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(1, os.path.abspath('../../modules/'))
 
 project = 'ping_traceroute'
 copyright = '2025, Akira Takeuchi'
 author = 'Akira Takeuchi'
+release = '1.0.0'
 
 
-latex_docclass = {'manual': 'jsbook'}
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -27,7 +28,7 @@ extensions = [
 
 templates_path = ['_templates']
 exclude_patterns = []
-
+html_extra_path = ['extra']
 
 
 # -- Options for HTML output -------------------------------------------------
