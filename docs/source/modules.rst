@@ -1,7 +1,6 @@
-CSCI651_hw1
-===========
+projects
+========
 
 .. toctree::
    :maxdepth: 4
 
-   pktsniffer

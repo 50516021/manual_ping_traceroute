@@ -119,7 +119,10 @@ def ping(host, count, wait_interval, size, timeout):
 
         print(f"PING {host} ({dest_addr}): {size} data bytes")
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+        sock = socket.socket(
+            socket.AF_INET,
+            socket.SOCK_RAW,
+            socket.IPPROTO_ICMP)
 
         transmitted = 0
         received = 0

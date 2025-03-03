@@ -62,10 +62,10 @@ If using Windows, ensure Windows Defender Firewall allows ICMP traffic:
 Example usage:
 
 ```
-sudo <python> my_ping.py -c 5   <host address> #stop at 5 packets
-sudo <python> my_ping.py -i 2   <host address> #wait for 2 seconds to send another packet
-sudo <python> my_ping.py -s 112 <host address> #specify the packet size as 112 bytes
-sudo <python> my_ping.py -t 2   <host address> #set 2 seconds time limit for receiving packets
+sudo <python> my_ping.py -c 5   <host address> # stop at 5 packets
+sudo <python> my_ping.py -i 2   <host address> # wait for 2 seconds to send another packet
+sudo <python> my_ping.py -s 112 <host address> # specify the packet size as 112 bytes
+sudo <python> my_ping.py -t 2   <host address> # set 2 seconds time limit for receiving packets
 ```
 
 ### 2.2- Traceroute options
@@ -77,9 +77,9 @@ sudo <python> my_ping.py -t 2   <host address> #set 2 seconds time limit for rec
 Example usage:
 
 ```
-sudo <python> my_traceroute.py -n 5   <host address> #
-sudo <python> my_traceroute.py -q 2   <host address> #
-sudo <python> my_traceroute.py -S 112 <host address> #
+sudo <python> my_traceroute.py -n   <host address> # print hop addresses numerically
+sudo <python> my_traceroute.py -q 2 <host address> # set 2 quesries per TTL
+sudo <python> my_traceroute.py -S   <host address> # print out summary of percentage of probes
 ```
 
 ## 3- Reference
