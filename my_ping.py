@@ -29,14 +29,19 @@ def create_packet(id, size):
 
 
 def send_ping(sock, dest_addr, id, size):
-    """Send a single ping packet.
+    """Send a single ping packet and check for errors.
     :param name: sock, dest_addr, id, size
     :returns: N/A
     :rtype: N/A
     """
     packet = create_packet(id, size)
-    sock.sendto(packet, (dest_addr, 1))
-    print(f"DEBUG: Sent packet to {dest_addr} with id={id}")
+    try:
+        sock.sendto(packet, (dest_addr, 1))
+        # print(f"DEBUG: Sent packet to {dest_addr} with id={id}")
+    except socket.error as e:
+        print(f"ping: sendto: {e.strerror}")
+        return False
+    return True
 
 
 def receive_ping(sock, id, wait_interval):
@@ -47,32 +52,31 @@ def receive_ping(sock, id, wait_interval):
     """
 
     time_remaining = wait_interval
-    while True:
-        start_time = time.time()
-        readable = select.select([sock], [], [], time_remaining)
-        if not readable[0]:
+    start_time = time.time()
+    readable = select.select([sock], [], [], time_remaining)
+    if not readable[0]:
+        return None
+
+    time_received = time.time()
+    rec_packet, addr = sock.recvfrom(1024)
+    icmp_header = rec_packet[20:28]
+    type, code, checksum, packet_id, sequence = struct.unpack("bbHHh", icmp_header)
+    # print(f"DEBUG: Received packet from {addr[0]}: type={type}, code={code}, checksum={checksum}, id={packet_id}, sequence={sequence}")
+
+    if type == ICMP_DEST_UNREACH:
+        # analyse ICMP error message and gain original packet id
+        original_header = rec_packet[48:56]
+        _, _, _, original_id, _ = struct.unpack("bbHHh", original_header)
+        # print(f"DEBUG: Original packet ID in ICMP error message: {original_id}")
+        if original_id == id:
             return None
 
-        time_received = time.time()
-        rec_packet, addr = sock.recvfrom(1024)
-        icmp_header = rec_packet[20:28]
-        type, code, checksum, packet_id, sequence = struct.unpack("bbHHh", icmp_header)
-        print(f"DEBUG: Received packet from {addr[0]}: type={type}, code={code}, checksum={checksum}, id={packet_id}, sequence={sequence}")
+    if packet_id == id:
+        ttl = struct.unpack("B", rec_packet[8:9])[0]  # get TTL
+        delay = time_received - start_time
+        return delay, ttl
 
-        if type == ICMP_DEST_UNREACH:
-            # analyse ICMP error message and gain original packet id
-            original_header = rec_packet[48:56]
-            _, _, _, original_id, _ = struct.unpack("bbHHh", original_header)
-            print(f"DEBUG: Original packet ID in ICMP error message: {original_id}")
-            if original_id == id:
-                return None
-
-        if packet_id == id:
-            return time_received - start_time
-
-        time_remaining -= time_received - start_time
-        if time_remaining <= 0:
-            return None
+    return None
 
 
 def print_summary(host, transmitted, received, delays):
@@ -130,14 +134,16 @@ def ping(host, count, wait_interval, size, timeout):
                 transmitted += 1
                 result = receive_ping(sock, packet_id, wait_interval)
 
+                delay = 0
                 if result is None:
                     print(f"Request timeout for icmp_seq {i}")
                 else:
                     delay, ttl = result
                     received += 1
                     delays.append(delay * 1000)
-                    print(f"{size} bytes from {dest_addr}: icmp_seq={i} ttl={ttl} time={round(delay * 1000, 2)} ms")
+                    print(f"{size + 8} bytes from {dest_addr}: icmp_seq={i} ttl={ttl} time={round(delay * 1000, 2)} ms")
                 i += 1
+                time.sleep(wait_interval-delay)  # wait before sending the next packet
         except KeyboardInterrupt:
             print_summary(host, transmitted, received, delays)
             sys.exit()
@@ -164,7 +170,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--count", type=int, default=None, help="Number of packets to send")
     parser.add_argument("-i", "--interval", type=float, default=1, help="Interval between packets")
     parser.add_argument("-s", "--size", type=int, default=56, help="Payload size in bytes")
-    parser.add_argument("-t", "--timeout", type=int, default=None, help="Timeout before giving up on response")
+    parser.add_argument("-t", "--timeout", type=int, default=None, help="Timeout before exiting (in seconds)")
 
     args = parser.parse_args()
     ping(args.host, args.count, args.interval, args.size, args.timeout)

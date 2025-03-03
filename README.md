@@ -41,6 +41,15 @@ The main script `my_traceroute.py` will check your network routing to the networ
 sudo <python> my_traceroute.py <host address>
 ```
 
+### Windows operation:
+
+If using Windows, ensure Windows Defender Firewall allows ICMP traffic:
+
+- Turn Firewall off (not recommended, turn it back on after testing).
+- Create an Inbound ICMP Rule. (see this link: [Link](https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/configure))
+- Enable existing inbound ICMP rule. Look for advanced setting in printer and sharing settings and find inbound ICMP echo request.
+- Use the argparse module in Python to parse command-line arguments.
+
 ## 2- Examples of command-line usage
 
 ### 2.1- Ping options
@@ -53,10 +62,10 @@ sudo <python> my_traceroute.py <host address>
 Example usage:
 
 ```
-sudo <python> my_ping.py -c 5   123.000.000.000 #stop at 5 packets
-sudo <python> my_ping.py -i 2   123.000.000.000 #wait for 2 seconds to send another packet
-sudo <python> my_ping.py -s 112 123.000.000.000 #specify the packet size as 112 bytes
-sudo <python> my_ping.py -t 2   123.000.000.000 #set 2 seconds time limit for receiving packets
+sudo <python> my_ping.py -c 5   <host address> #stop at 5 packets
+sudo <python> my_ping.py -i 2   <host address> #wait for 2 seconds to send another packet
+sudo <python> my_ping.py -s 112 <host address> #specify the packet size as 112 bytes
+sudo <python> my_ping.py -t 2   <host address> #set 2 seconds time limit for receiving packets
 ```
 
 ### 2.2- Traceroute options
@@ -68,9 +77,9 @@ sudo <python> my_ping.py -t 2   123.000.000.000 #set 2 seconds time limit for re
 Example usage:
 
 ```
-sudo <python> my_traceroute.py -n 5   123.000.000.000 #
-sudo <python> my_traceroute.py -q 2   123.000.000.000 #
-sudo <python> my_traceroute.py -S 112 123.000.000.000 #
+sudo <python> my_traceroute.py -n 5   <host address> #
+sudo <python> my_traceroute.py -q 2   <host address> #
+sudo <python> my_traceroute.py -S 112 <host address> #
 ```
 
 ## 3- Reference
